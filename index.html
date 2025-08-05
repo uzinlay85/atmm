@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>မြန်မာဘာသာပြန်စက်</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Padauk', sans-serif;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-8">
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-2xl w-full">
+        <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <div class="text-center mb-6">
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">ဘာသာပြန်နှင့် အနှစ်ချုပ်</h1>
+                <p class="text-gray-500 mt-2">စာသားများကို မြန်မာဘာသာသို့ ပြန်ဆိုပြီး အနှစ်ချုပ် ထုတ်ပေးသည်</p>
+            </div>
+
+            <!-- API Key Section -->
+            <div id="apiKeySection" class="mb-6 p-4 bg-gray-50 rounded-lg border">
+                 <label for="apiKeyInput" class="block text-lg font-semibold text-gray-700 mb-2">Gemini API သော့</label>
+                 <div class="flex items-center space-x-2">
+                    <input type="password" id="apiKeyInput" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="သင်၏ API သော့ကို ဤနေရာတွင် ထည့်ပါ">
+                    <button id="saveApiKeyButton" class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700">သိမ်းဆည်းရန်</button>
+                    <button id="editApiKeyButton" class="hidden bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600">ပြင်ဆင်ရန်</button>
+                 </div>
+            </div>
+
+            <!-- Input Section -->
+            <div class="mb-4">
+                <label for="inputText" class="block text-lg font-semibold text-gray-700 mb-2">ဘာသာပြန်လိုသော စာသား</label>
+                <textarea id="inputText" rows="6" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="ဘာသာပြန်လိုသော စာသားကို ဤနေရာတွင် ရိုက်ထည့်ပါ..."></textarea>
+            </div>
+
+            <!-- Translate Button -->
+            <div class="text-center mb-6">
+                <button id="translateButton" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-transform transform hover:scale-105 active:scale-100">
+                    ဘာသာပြန်ရန်
+                </button>
+            </div>
+            
+            <!-- Loading Spinner -->
+            <div id="loader" class="flex justify-center my-4 hidden">
+                <div class="spinner"></div>
+            </div>
+
+            <!-- Output Section -->
+            <div id="outputSection" class="hidden space-y-6">
+                <!-- Full Translation -->
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-4">ဘာသာပြန်ချက်</h2>
+                    <div id="outputText" class="bg-gray-50 p-4 rounded-lg text-gray-700 text-lg min-h-[100px] whitespace-pre-wrap"></div>
+                    <button id="copyTranslationButton" class="mt-4 bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                        ဘာသာပြန်ချက် ကူးယူရန်
+                    </button>
+                </div>
+
+                <!-- Summary -->
+                <div id="summarySection" class="hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 mb-4">လိုရင်းအနှစ်ချုပ်</h2>
+                    <div id="summaryText" class="bg-blue-50 p-4 rounded-lg text-gray-800 text-lg min-h-[80px] whitespace-pre-wrap"></div>
+                     <button id="copySummaryButton" class="mt-4 bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                        အနှစ်ချုပ် ကူးယူရန်
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Error Message -->
+            <div id="errorMessage" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mt-4">
+                <strong class="font-bold">အမှားအယွင်း!</strong>
+                <span class="block sm:inline">လုပ်ငန်းစဉ်တွင် အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်။ ကျေးဇူးပြု၍ နောက်တစ်ကြိမ် ထပ်ကြိုးစားပါ။</span>
+            </div>
+        </div>
+        <footer class="text-center mt-6 text-sm text-gray-500">
+            <p>Powered by Gemini</p>
+        </footer>
+    </div>
+
+    <script>
+        // Get elements from the DOM
+        const translateButton = document.getElementById('translateButton');
+        const inputText = document.getElementById('inputText');
+        
+        const outputSection = document.getElementById('outputSection');
+        const outputText = document.getElementById('outputText');
+        const copyTranslationButton = document.getElementById('copyTranslationButton');
+
+        const summarySection = document.getElementById('summarySection');
+        const summaryText = document.getElementById('summaryText');
+        const copySummaryButton = document.getElementById('copySummaryButton');
+        
+        const loader = document.getElementById('loader');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // API Key elements
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const saveApiKeyButton = document.getElementById('saveApiKeyButton');
+        const editApiKeyButton = document.getElementById('editApiKeyButton');
+
+        // Setup API Key UI on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('geminiApiKey');
+            if (savedKey) {
+                apiKeyInput.value = savedKey;
+                apiKeyInput.readOnly = true;
+                apiKeyInput.type = 'password';
+                saveApiKeyButton.classList.add('hidden');
+                editApiKeyButton.classList.remove('hidden');
+            }
+        });
+
+        // Edit API Key button logic
+        editApiKeyButton.addEventListener('click', () => {
+            apiKeyInput.readOnly = false;
+            apiKeyInput.type = 'text';
+            apiKeyInput.focus();
+            editApiKeyButton.classList.add('hidden');
+            saveApiKeyButton.classList.remove('hidden');
+        });
+
+        // Save API Key button logic
+        saveApiKeyButton.addEventListener('click', () => {
+            const key = apiKeyInput.value.trim();
+            if (key) {
+                localStorage.setItem('geminiApiKey', key);
+                apiKeyInput.readOnly = true;
+                apiKeyInput.type = 'password';
+                saveApiKeyButton.classList.add('hidden');
+                editApiKeyButton.classList.remove('hidden');
+                showError('API သော့ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။', 'green');
+            } else {
+                showError('ကျေးဇူးပြု၍ API သော့ကို ထည့်ပါ။');
+            }
+        });
+
+        // Main translate function on button click
+        translateButton.addEventListener('click', async () => {
+            const apiKey = localStorage.getItem('geminiApiKey');
+            if (!apiKey) {
+                showError('ကျေးဇူးပြု၍ သင်၏ Gemini API သော့ကို ဦးစွာထည့်သွင်းပြီး သိမ်းဆည်းပါ။');
+                return;
+            }
+
+            const textToTranslate = inputText.value.trim();
+            if (!textToTranslate) {
+                showError('ကျေးဇူးပြု၍ ဘာသာပြန်ရန် စာသားအချို့ကို ထည့်ပါ။');
+                return;
+            }
+
+            // Reset UI for new request
+            resetUI();
+            
+            const translationPrompt = `Translate the following text directly and accurately into Burmese. Do not provide any explanations, notes, or extra text. Just the translation. Text: "${textToTranslate}"`;
+
+            try {
+                // 1. Get the full translation
+                const translatedText = await callGeminiAPI(translationPrompt, apiKey);
+                
+                if (translatedText) {
+                    outputText.textContent = translatedText;
+                    outputSection.classList.remove('hidden');
+
+                    // 2. After getting translation, get the summary
+                    const summaryPrompt = `Summarize the following Burmese text concisely, capturing the main points. Provide only the summary in natural Burmese. Text: "${translatedText}"`;
+                    const summaryResult = await callGeminiAPI(summaryPrompt, apiKey);
+
+                    if (summaryResult) {
+                        summaryText.textContent = summaryResult;
+                        summarySection.classList.remove('hidden');
+                    } else {
+                        console.log("Could not generate summary.");
+                        summarySection.classList.add('hidden');
+                    }
+                } else {
+                    throw new Error('No content received from API for translation.');
+                }
+
+            } catch (error) {
+                console.error('Operation Error:', error);
+                showError('ဘာသာပြန်ခြင်း သို့မဟုတ် အနှစ်ချုပ်ခြင်း လုပ်ငန်းစဉ်တွင် အမှားတစ်ခု ဖြစ်ပွားခဲ့သည်။ API သော့ မှန်မမှန် စစ်ဆေးပါ။');
+            } finally {
+                loader.classList.add('hidden');
+                translateButton.disabled = false;
+            }
+        });
+        
+        // Helper function to reset UI state
+        function resetUI() {
+            outputSection.classList.add('hidden');
+            summarySection.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            loader.classList.remove('hidden');
+            translateButton.disabled = true;
+        }
+
+        // Helper function to show error/success messages
+        function showError(message, type = 'red') {
+            const colors = {
+                red: { bg: 'bg-red-100', border: 'border-red-400', text: 'text-red-700' },
+                green: { bg: 'bg-green-100', border: 'border-green-400', text: 'text-green-700' }
+            };
+            const selectedColor = colors[type] || colors.red;
+
+            // Remove existing color classes
+            Object.values(colors).forEach(colorSet => {
+                errorMessage.classList.remove(...Object.values(colorSet));
+            });
+
+            errorMessage.classList.add(selectedColor.bg, selectedColor.border, selectedColor.text);
+            errorMessage.querySelector('span').textContent = message;
+            errorMessage.querySelector('strong').textContent = (type === 'red') ? 'အမှားအယွင်း!' : 'အောင်မြင်ပါသည်!';
+            errorMessage.classList.remove('hidden');
+            setTimeout(() => errorMessage.classList.add('hidden'), 4000);
+        }
+
+        // Copy button functionalities
+        copyTranslationButton.addEventListener('click', () => {
+            copyToClipboard(outputText.textContent, copyTranslationButton, 'ဘာသာပြန်ချက် ကူးယူပြီးပါပြီ!', 'ဘာသာပြန်ချက် ကူးယူရန်');
+        });
+
+        copySummaryButton.addEventListener('click', () => {
+            copyToClipboard(summaryText.textContent, copySummaryButton, 'အနှစ်ချုပ် ကူးယူပြီးပါပြီ!', 'အနှစ်ချုပ် ကူးယူရန်');
+        });
+
+        function copyToClipboard(text, buttonElement, successMessage, originalMessage) {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = text;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                buttonElement.textContent = successMessage;
+                setTimeout(() => {
+                    buttonElement.textContent = originalMessage;
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        // API call function with exponential backoff
+        async function callGeminiAPI(prompt, apiKey) {
+             let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+             const payload = { contents: chatHistory };
+             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+             
+             let delay = 1000;
+             for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (text) {
+                            return text;
+                        } else {
+                           throw new Error("Invalid response structure from API");
+                        }
+                    } else if (response.status === 429) { // Throttling
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    } else {
+                        throw new Error(`API request failed with status ${response.status}`);
+                    }
+                } catch (error) {
+                    if (i === 4) { // Last retry failed
+                        throw error;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+             }
+             throw new Error("API request failed after multiple retries.");
+        }
+    </script>
+</body>
+</html>
